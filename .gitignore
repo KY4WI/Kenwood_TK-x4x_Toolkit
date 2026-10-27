@@ -1,0 +1,23 @@
+# Build products
+tkx4xtoolkit
+tkx4xtoolkit-*
+*.exe
+*.macos
+dist/
+backups/
+
+# Toolkit firmware/backup files
+*.tk4firm
+*.tk4chan
+*.tk4back
+
+# Raw radio dumps (never commit Kenwood ROM or firmware images)
+*.bin
+*.hex
+
+# Local machine-specific build settings
+mac-credentials.mk
+
+# Editor/OS noise
+.DS_Store
+__pycache__/

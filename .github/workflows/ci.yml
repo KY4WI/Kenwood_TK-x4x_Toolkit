@@ -1,0 +1,47 @@
+name: Linux build and CLI smoke tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  linux:
+    runs-on: ubuntu-24.04
+    # git init inside actions/checkout otherwise emits a default-branch warning.
+    env:
+      GIT_CONFIG_COUNT: "1"
+      GIT_CONFIG_KEY_0: init.defaultBranch
+      GIT_CONFIG_VALUE_0: main
+    steps:
+      - uses: actions/checkout@v5
+      - name: Compile native uncompressed executable
+        run: make plain
+      - name: Run Toolkit regression suite
+        run: python3 -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Verify integrated firmware normalization using synthetic images
+        run: |
+          cc -std=c99 -O2 -Wall -Wextra -Wpedantic -o /tmp/test-transmutation tests/test_fwtransmute_normalization.c
+          /tmp/test-transmutation
+      - name: Test legacy +25 MHz offset patch variants
+        run: |
+          cc -std=c11 -O2 -Wall -Wextra -Wpedantic -o /tmp/test-plus25 tests/test_plus25_patch.c
+          /tmp/test-plus25
+      - name: Validate Kenwood Intel HEX import/export with synthetic firmware
+        run: |
+          cc -std=c11 -O2 -Wall -Wextra -Wpedantic -o /tmp/test-firmware-hex firmware_hex.c tests/test_firmware_hex.c
+          /tmp/test-firmware-hex
+      - name: Test version and help
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$(./tkx4xtoolkit --version)"
+          ./tkx4xtoolkit --help > /tmp/tkx4x-help.txt
+          test -s /tmp/tkx4x-help.txt
+          grep -q 'Usage:' /tmp/tkx4x-help.txt
+          grep -q 'Commands:' /tmp/tkx4x-help.txt
+          grep -q 'Global options:' /tmp/tkx4x-help.txt
+          ! grep -q 'Timing information:' /tmp/tkx4x-help.txt
+          ./tkx4xtoolkit -h > /tmp/tkx4x-help-short.txt
+          cmp /tmp/tkx4x-help.txt /tmp/tkx4x-help-short.txt
+          ./tkx4xtoolkit help > /tmp/tkx4x-project-help.txt
+          grep -q 'Firmware Recovery\|FIRMWARE RECOVERY' /tmp/tkx4x-project-help.txt
