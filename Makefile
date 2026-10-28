@@ -1,11 +1,12 @@
 # Copyright (c) 2026 Dave, KY4WI
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# Use up to twelve parallel Make jobs by default. An explicit -j/--jobs
-# option on the command line (including -j1) takes precedence.
-# This affects independent Make targets, not GCC's own compilation threads.
+# Default to one parallel Make job per available logical CPU.
+# An explicit -j/--jobs option (including -j1) takes precedence.
+# This affects independent Make targets, not GCC's compilation threads.
+# nproc is preferred on Linux; getconf and sysctl cover other Unix hosts.
 ifeq ($(filter -j% --jobs%,$(MAKEFLAGS)),)
-MAKEFLAGS += -j12
+MAKEFLAGS += -j$(shell nproc 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.logicalcpu 2>/dev/null || echo 1)
 endif
 
 CC ?= cc
