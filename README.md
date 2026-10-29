@@ -84,6 +84,8 @@ The Enhanced TOT Patch has been hardware-tested on **TK-840 firmware 8355 and 93
 - **Historical +25 MHz Offset Patch:** Substitutes a fixed +25 MHz TX offset on TK-940/941 radios. Like stock firmware, it still ignores each channel's programmed TX-frequency field. Enhanced TX supersedes this workaround by allowing independent RX and TX programming.
 - **Legacy TOT Bypass:** Disables the timer unconditionally rather than adding an Off choice. Enhanced TOT supersedes this approach because you can still select a normal timeout when desired.
 
+The original +25 MHz offset and TOT patches were developed by **Neal, KB5ERY (SK)**. Credit for those earlier modifications belongs to him.
+
 The Toolkit recognizes supported historical modifications and offers suitable removal or replacement operations. Existing patches are checked before changes are made; unknown firmware or unrecognized modifications are not patched.
 
 ## Supported radios and firmware
